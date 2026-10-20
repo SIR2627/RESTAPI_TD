@@ -1,6 +1,31 @@
 const express = require('express');
+const dotenv = require('dotenv');
 const app = express()
 const port = 3000
+
+const mongoose = require('mongoose');
+
+dotenv.config();
+
+const alunoSchema = new mongoose.Schema({
+  nome: String,
+  idade: Number,
+  cursoId: String
+});
+
+const Aluno = mongoose.model('Aluno', alunoSchema);
+
+dbconnect().catch(err => console.log(err));
+
+async function dbconnect() {
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("DB connected successfully!");
+}
+
+app.get('/alunos', async (req, res) => {
+  const alunos = await Aluno.find();
+  res.json(alunos);
+});
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -21,3 +46,4 @@ app.get('/bomdia/:num', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
